@@ -1,79 +1,94 @@
 package com.revature.service;
 
+import org.apache.log4j.Logger;
 import com.revature.exception.*;
 import com.revature.model.Account;
+import com.revature.repository.BankDao;
+import com.revature.repository.BankDaoPostgres;
 
 public class Service {
 
-	public Service() {
-		super();
-	}
+  private static Logger log = Logger.getLogger(Service.class);
+  static BankDao bankdao = new BankDaoPostgres();
 
-	/*
-	 * Accepts a user identification and prints the current balance
-	 */
-	public static Double CheckBalance(Account user) {
-		System.out.println(
-				"The current balance for user " + user.getUsername() + " is : " + user.getAmount() + " dollars.");
+  /*
+   * Accepts a user identification and prints the current balance
+   */
+  public static Double CheckBalance(Account user) {
 
-		return user.getAmount();
-	}
+    // Double amount = user.getAmount();
 
-	/*
-	 * Subtracts parameter amount from specified user Throws OverdraftException
-	 */
-	public static Double Withdrawal(Account user, Double amount) {
-		try {
-			if (user.getAmount() - amount < 0.0) {
-				throw new OverdraftException();
-			}
-			System.out.println("\n" + amount + " dollars have been withdrawn.");
+    System.out.println("The current balance for user " + user.getUsername() + " is : $"
+        + user.getAmount() + " dollars.\n");
 
-			user.setAmount((user.getAmount() - amount));
+    return user.getAmount();
+  }
 
-		} catch (OverdraftException e) {
+  /*
+   * Subtracts parameter amount from specified user Throws OverdraftException
+   */
+  public static Double Withdrawal(Account user, Double amount) {
+    try {
+      if (user.getAmount() - amount < 0.0) {
+        throw new OverdraftException();
+      }
+      System.out.println("\n" + amount + " dollars have been withdrawn from "+user.getUsername());
 
-		}
-		System.out.println("Your account balance is " + user.getAmount());
-		return user.getAmount();
-	}
+      // Double balance = user.getAmount();
 
-	/*
-	 * Adds the parameter amount to a specified user Throws OverdraftException
-	 */
-	public static Double Deposit(Account user, Double amount) {
-		try {
-			if (amount > 50000.0) {
-				throw new SuspiciousDepositException();
-			}
-			System.out.println(amount + " dollars have been added to your account.");
-			user.setAmount(user.getAmount() + amount);
-			;
-		} catch (SuspiciousDepositException e) {
+      user.setAmount((user.getAmount() - amount));
 
-		}
-		System.out.print("Your account balance is : " + user.getAmount());
-		return user.getAmount();
-	}
+      bankdao.update(user);
+      bankdao.TransactionLog(user.getId(), (amount * -1));
+      
+      Service.CheckBalance(user);
 
-	/*
-	 * Transfers an amount from give to take Throws Overdraft Exception,
-	 * InvalidDestination Exception
-	 */
-	public static Double Transfer(Account give, Account take, Double amount) {
-		try {
-			if (take.getUsername() == "username") {
-			} else {
-				throw new InvalidUserException();
-			}
-		} catch (InvalidUserException e) {
-		}
+    } catch (OverdraftException e) {
+      e.printStackTrace();
+    }
+    log.info("Withdrew " + amount + " from account : " + user.getUsername());
+    return user.getAmount();
+  }
 
-		Withdrawal(give, amount);
-		Deposit(take, amount);
-		CheckBalance(give);
-		CheckBalance(take);
+  /*
+   * Adds the parameter amount to a specified user Throws OverdraftException
+   */
+  public static Double Deposit(Account user, Double amount) {
+    try {
+      if (amount < 0.0) {
+        throw new NegativeDepositException();
+      }
+      System.out.println(amount + " dollars have been added to account "+user.getUsername());
 
-		return give.getAmount();
-	}
+      // Double balance = user.getAmount();
+      user.setAmount(user.getAmount() + amount);
+
+      bankdao.update(user);
+      bankdao.TransactionLog(user.getId(), amount);
+
+      Service.CheckBalance(user);
+
+    } catch (NegativeDepositException e) {
+      e.printStackTrace();
+    }
+    log.info("Deposited " + amount + " from account : " + user.getUsername());
+    return user.getAmount();
+  }
+
+  /*
+   * Transfers an amount from give to take Throws Overdraft Exception, InvalidDestination Exception
+   */
+  public static void Transfer(Account give, String username, String password, Double amount) {
+
+    Account take = bankdao.VerifyUser(username, password);
+
+    Withdrawal(give, amount);
+    Deposit(take, amount);
+    CheckBalance(give);
+    CheckBalance(take);
+  }
+
+  public static void showHistory(Account user) {
+    bankdao.showHistory(user);
+  }
 }

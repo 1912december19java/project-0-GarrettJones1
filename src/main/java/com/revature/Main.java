@@ -1,8 +1,6 @@
 package com.revature;
 
 import com.revature.controller.Controller;
-import com.revature.model.Account;
-import java.util.Scanner;
 
 /**
  * Create an instance of your controller and launch your application.
@@ -13,26 +11,29 @@ public class Main {
 
   public static void main(String[] args) {
 
-    // Implement Login and instantiate a User
-    Account user = new Account("user", "pass", 100.00);
-    System.out.println("Account created");
-    // After passing Login, use controller to guide user threw the program
-    System.out.println("controller created");
+    PrintWelcome();
 
-    Scanner sc = new Scanner(System.in);
-    String input = "HelloWorld";
+    Controller.LogIn();
 
-    do {
+  }
 
-      // implement login functionality
+  public static void PrintWelcome() {
+    System.out.println("    ____                  __                ");
+    System.out.println("   / __ \\___ _   ______ _/ /___  __________ ");
+    System.out.println("  / /_/ / _ \\ | / / __ `/ __/ / / / ___/ _ \\");
+    System.out.println(" / _, _/  __/ |/ / /_/ / /_/ /_/ / /  /  __/");
+    System.out.println("/_/ |_|\\___/|___/\\__,_/\\__/\\__,_/_/   \\___/ \n");
+    System.out.println("    ____              __   _            ");
+    System.out.println("   / __ )____ _____  / /__(_)___  ____ _");
+    System.out.println("  / __  / __ `/ __ \\/ //_/ / __ \\/ __ `/");
+    System.out.println(" / /_/ / /_/ / / / / ,< / / / / / /_/ / ");
+    System.out.println("/_____/\\__,_/_/ /_/_/|_/_/_/ /_/\\__, /  ");
+    System.out.println("                               /____/   ");
+    System.out.println("    ____          ");
+    System.out.println("   /  _/___  _____");
+    System.out.println("   / // __ \\/ ___/");
+    System.out.println(" _/ // / / / /___ ");
+    System.out.println("/___/_/ /_/\\___(_)\n");
 
-      Controller.UI(user);
-
-      System.out.println("\nWould you like to logIn as another User? y\n");
-      input = sc.nextLine();
-
-    } while (!input.equalsIgnoreCase("n"));
-    System.out.println("Thank you for banking with us!");
-    sc.close();
   }
 }

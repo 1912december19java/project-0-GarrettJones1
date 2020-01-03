@@ -3,24 +3,19 @@ package com.revature.repository;
 import com.revature.model.Account;
 
 public interface BankDao {
+  // Verify user and return an Account object to be used by the service class
+  Account VerifyUser(String username, String password);
 
-  //Read
-  Account getBalance(Account user);
+  // Persist data to the database
+  void update(Account user);
+
+  // Create user
+  Account register(Account newUser);
+
+  // Delete
+  void delete(String username, String password);
+
+  void TransactionLog(int id, double d);
   
-  //Update
-  Account Withdraw(Account user);
-  
-  //Update
-  Account Deposit(Account user);
-  
-  //Update
-  void Transfer(Account give, Account take, Double amount);
-  
-  //Create user
-  void register(Account newUser);
-  
-  //Delete
-  void delete(Account user);
-  
-  
+  void showHistory(Account user);
 }
